@@ -22,7 +22,7 @@ GetOptions(
   'help!' => \$help,
 ) or $help = 1;
 
-if ( $help || $ifile eq "" || $oname eq "" ) {
+if ( $help || $ifile eq "") {
   print "Usage: ./fasta_stats.pl -i <fasta_file> -b <bin_size> -o <output_name>\n";
   print "       fasta_file    Fasta file for which statistics are calculated.\n";
   print "       bin_size      Default histrogram bin size is 200 (bp)\n";
