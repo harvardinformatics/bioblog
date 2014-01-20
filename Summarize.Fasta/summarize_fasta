@@ -1,4 +1,9 @@
 #Make length historgram and summary statistics for a fasta file
+#
+#Author:
+# Chris Williams
+# Harvard Informatics And Scientific Applications
+# http://informatics.fas.harvard.edu
 
 #Example usage: summarize_fasta MySample.fasta "MySample" ~/output ~/temp
 

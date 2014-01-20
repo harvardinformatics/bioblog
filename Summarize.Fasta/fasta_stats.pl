@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+#
+#Author:
+# Chris Williams
+# Harvard Informatics And Scientific Applications
+# http://informatics.fas.harvard.edu
+
 use POSIX;
 use Getopt::Long;
 use strict;

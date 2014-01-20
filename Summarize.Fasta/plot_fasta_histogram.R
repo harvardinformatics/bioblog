@@ -1,4 +1,9 @@
 #Make histrogram plot from the output files of fasta_stats.pl
+#
+#Author:
+# Chris Williams
+# Harvard Informatics And Scientific Applications
+# http://informatics.fas.harvard.edu
 
 argv <- commandArgs(TRUE)
 histfile  <- argv[1]
