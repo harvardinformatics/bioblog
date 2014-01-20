@@ -13,5 +13,4 @@ module load centos6/trinityrnaseq_r20131110
 Trinity.pl --seqType fq --JM 20G \
            --left  R1.paired.and_orphans.fastq \
            --right R2.paired.fastq \
-           --output ~/Trinity \
            --CPU 6
