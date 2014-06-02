@@ -17,8 +17,8 @@ use constant { true => 1, false => 0 };
 
 my $fastq_file = "";
 my $barcodes_file = "";
-my $outdir = "";
-my $max_mismatches = 1;
+my $outdir = ".";
+my $max_mismatches = 0;
 my $help = 0;
 
 Getopt::Long::GetOptions(
