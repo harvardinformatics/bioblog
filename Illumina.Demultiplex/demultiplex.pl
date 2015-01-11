@@ -22,12 +22,12 @@ my $max_mismatches = 0;
 my $help = 0;
 
 Getopt::Long::GetOptions(
-  'fastq=s'    => \$fastq_file,
-  'barcodes=s' => \$barcodes_file,
-  'mismatches' => \$max_mismatches,
-  'out'        => \$outdir,
-  'help'       => \$help,
-  'h'          => \$help,
+  'fastq=s'      => \$fastq_file,
+  'barcodes=s'   => \$barcodes_file,
+  'mismatches:i' => \$max_mismatches,
+  'out:s'        => \$outdir,
+  'help'         => \$help,
+  'h'            => \$help,
   ) or die "Incorrect input! Use -h for usage.\n";
 
 if ($help) {
