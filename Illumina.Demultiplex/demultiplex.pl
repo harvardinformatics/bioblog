@@ -19,19 +19,23 @@ my $fastq_file = "";
 my $barcodes_file = "";
 my $outdir = ".";
 my $max_mismatches = 0;
+my $filter_n = 0;
+my $crop_n = 0;
 my $help = 0;
 
 Getopt::Long::GetOptions(
   'fastq=s'      => \$fastq_file,
   'barcodes=s'   => \$barcodes_file,
   'mismatches:i' => \$max_mismatches,
+  'filter-n'     => \$filter_n,
+  'crop-n'       => \$crop_n,
   'out:s'        => \$outdir,
   'help'         => \$help,
   'h'            => \$help,
   ) or die "Incorrect input! Use -h for usage.\n";
 
 if ($help) {
-  print "\nUsage: demult.pl -fastq <fastq_file> -barcodes <barcodes_file> [Options]\n";
+  print "\nUsage: perl demultiplex.pl -fastq <fastq_file> -barcodes <barcodes_file> [Options]\n";
   print "Options:\n";
   print "  -fastq      The fastq file to be demultiplexed\n";
   print "  -barcodes   A tab-deliminted, two-column file of sample names and barcodes\n";
@@ -96,10 +100,20 @@ while( my $line = <FA> ) {
       }
     }
     
-    if ( $num_hits == 1 ) { #if the index_read mapped to exactly one barcode, write the read to that barcode's file.
-      my $fh = $bh{$barcode_hit}{"filehandle"};
-      print $fh "$name\n$read\n$plus\n$qual\n";
+    if ( $num_hits != 1 ) { #skip read if it did not map to exactly one barcode
+      next;
     }
+
+    if ($filter_n and $read =~ m/[nN]/) { #skip read if filter-n option was specified, and read contains an uncalled base
+      next;
+    }
+
+    if ($crop_n) {  #if crop-n option was specified, crop read at first uncalled base
+      $read =~ s/[nN].*$//;
+    } 
+
+    my $fh = $bh{$barcode_hit}{"filehandle"};
+    print $fh "$name\n$read\n$plus\n$qual\n";
     
     $name = "";
     $read = "";
