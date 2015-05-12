@@ -21,29 +21,32 @@ my $outdir = ".";
 my $max_mismatches = 0;
 my $filter_n = 0;
 my $crop_n = 0;
+my $ignore_barcode_n = 0;
 my $help = 0;
 
 Getopt::Long::GetOptions(
-  'fastq=s'      => \$fastq_file,
-  'barcodes=s'   => \$barcodes_file,
-  'mismatches:i' => \$max_mismatches,
-  'filter-n'     => \$filter_n,
-  'crop-n'       => \$crop_n,
-  'out:s'        => \$outdir,
-  'help'         => \$help,
-  'h'            => \$help,
+  'fastq=s'          => \$fastq_file,
+  'barcodes=s'       => \$barcodes_file,
+  'mismatches:i'     => \$max_mismatches,
+  'filter-n'         => \$filter_n,
+  'crop-n'           => \$crop_n,
+  'ignore-barcode-n' => \$ignore_barcode_n,
+  'out:s'            => \$outdir,
+  'help'             => \$help,
+  'h'                => \$help,
   ) or die "Incorrect input! Use -h for usage.\n";
 
 if ($help) {
   print "\nUsage: perl demultiplex.pl -fastq <fastq_file> -barcodes <barcodes_file> [Options]\n";
   print "Options:\n";
-  print "  -fastq      The fastq file to be demultiplexed\n";
-  print "  -barcodes   A tab-deliminted, two-column file of sample names and barcodes\n";
-  print "  -mismatches Maximum number of mismatches to allow\n";
-  print "  -crop-n     Crop reads at first uncalled (N) base";
-  print "  -filter-n   Remove reads with uncalled (N) bases";
-  print "  -out        Output directory";
-  print "  -help|-h    Display usage information.\n";
+  print "  -fastq             The fastq file to be demultiplexed\n";
+  print "  -barcodes          A tab-deliminted, two-column file of sample names and barcodes\n";
+  print "  -mismatches        Maximum number of mismatches to allow\n";
+  print "  -crop-n            Crop reads at first uncalled (N) base";
+  print "  -filter-n          Remove reads with uncalled (N) bases";
+  print "  -ignore-barcode-n  Do not allow N's in barcode read to contribute to number of mismatches";
+  print "  -out               Output directory";
+  print "  -help|-h           Display usage information.\n";
   exit 0;
 }
 
@@ -93,27 +96,41 @@ while( my $line = <FA> ) {
     }
 
     my $index_read = substr($name,-$ilength);
-    my $num_hits = 0;
-    my $barcode_hit = "";
-    foreach my $barcode (keys %bh) { #see if index_read matches one or more barcodes
-      if ( hd($barcode,$index_read) <= $max_mismatches ) {
-	$barcode_hit = $barcode;
-	$num_hits++;
-      }
-    }
-    
-    if ( $num_hits != 1 ) { #skip read if it did not map to exactly one barcode
+
+    if ($filter_n && $read =~ m/[nN]/) { #skip read if filter-n option was specified, and read contains an uncalled base
       next;
     }
 
-    if ($filter_n and $read =~ m/[nN]/) { #skip read if filter-n option was specified, and read contains an uncalled base
+    my $num_hits = 0;
+    my $barcode_hit = "";
+
+    foreach my $barcode (keys %bh) { #see if index_read matches one or more barcodes
+
+      my $hit = false;
+      
+      if ($ignore_barcode_n) {  #if ignore-barcode-n is specified, then replace N's in index_read 
+	my $index_read_copy = $index_read;
+
+	while ($index_read_copy =~ m/[nN]/g) {
+	  substr($index_read, $-[0], 1) = substr($barcode, $-[0], 1)
+	}
+      }
+	
+      if ( hd($barcode,$index_read) <= $max_mismatches ) {  #calculate hamming distance
+	$barcode_hit = $barcode;
+	$num_hits++;
+      }
+	
+    }
+    
+    if ($num_hits != 1) { #skip read if it did not map to exactly one barcode
       next;
     }
 
     if ($crop_n) {  #if crop-n option was specified, crop read at first uncalled base
       $read =~ s/[nN].*$//;
     } 
-
+      
     my $fh = $bh{$barcode_hit}{"filehandle"};
     print $fh "$name\n$read\n$plus\n$qual\n";
     
