@@ -42,10 +42,10 @@ if ($help) {
   print "  -fastq             The fastq file to be demultiplexed\n";
   print "  -barcodes          A tab-deliminted, two-column file of sample names and barcodes\n";
   print "  -mismatches        Maximum number of mismatches to allow\n";
-  print "  -crop-n            Crop reads at first uncalled (N) base";
-  print "  -filter-n          Remove reads with uncalled (N) bases";
-  print "  -ignore-barcode-n  Do not allow N's in barcode read to contribute to number of mismatches";
-  print "  -out               Output directory";
+  print "  -crop-n            Crop reads at first uncalled (N) base\n";
+  print "  -filter-n          Remove reads with uncalled (N) bases\n";
+  print "  -ignore-barcode-n  Do not allow N's in barcode read to contribute to number of mismatches\n";
+  print "  -out               Output directory\n";
   print "  -help|-h           Display usage information.\n";
   exit 0;
 }
